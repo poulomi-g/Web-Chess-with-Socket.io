@@ -36,3 +36,6 @@ socket.on('move', function (msg) {
     game.move(msg);
     board.position(game.fen());
 })
+socket.on('connectToRoom', function(data){
+    socket.emit('connectToRoom', data)
+});
