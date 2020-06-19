@@ -16,7 +16,10 @@ io.on('connection', function(socket) {
     io.sockets.in("room-"+roomno).emit('connectToRoom', "You are in room"+roomno)
 
     socket.on('move', function(msg) {
-        socket.broadcast.emit('move', msg);
+        // socket.broadcast.emit('move', msg);
+        // socket.broadcast.to(otherSocket.id).emit('move', msg);
+        io.in("room-"+roomno).emit('move', msg)
+        console.log("moved room"+roomno)
     });
 });
 
