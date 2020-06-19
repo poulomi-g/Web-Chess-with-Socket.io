@@ -13,13 +13,15 @@ io.on('connection', function(socket) {
     socket.join("room-"+roomno);
     console.log("Room number: "+roomno);
 
-    io.sockets.in("room-"+roomno).emit('connectToRoom', "You are in room"+roomno)
+    io.sockets.in("room-"+roomno).emit('connectToRoom', "room-"+roomno)
 
     socket.on('move', function(msg) {
+        socket.on('movedRoom', function(data) {
+            console.log("moved room is: "+ data);
+        });
         // socket.broadcast.emit('move', msg);
         // socket.broadcast.to(otherSocket.id).emit('move', msg);
         io.in("room-"+roomno).emit('move', msg)
-        console.log("moved room"+roomno)
     });
 });
 

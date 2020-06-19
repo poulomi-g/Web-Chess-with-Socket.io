@@ -1,6 +1,6 @@
 var board; // UI Object
 var game; // Logic object
-
+// var data;
 window.onload = function () {
     initGame(); // Initializes game for first board setup
 };
@@ -32,10 +32,17 @@ var handleMove = function (source, target) {
     else socket.emit("move", move);
 };
 
-socket.on('move', function (msg) {
-    game.move(msg);
-    board.position(game.fen());
-})
 socket.on('connectToRoom', function(data){
-    socket.emit('connectToRoom', data)
+    socket.emit('connectToRoom', data);
+    var newdiv = document.getElementById("room-number");
+    newdiv.innerHTML = data
+    // console.log(data)
+    socket.on('move', function (msg) {
+        var room_div = document.getElementById("room-number");
+        data = room_div.innerHTML;
+        game.move(msg);
+        board.position(game.fen());
+        socket.emit('movedRoom', data);
+        console.log(data);
+    })
 });
