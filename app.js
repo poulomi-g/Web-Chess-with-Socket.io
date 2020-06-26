@@ -6,22 +6,23 @@ var port = process.env.PORT || 3000;
 
 var io = require('socket.io')(http);
 var roomno = 1;
-io.on('connection', function(socket) {
+io.on('connection', function (socket) {
     console.log('new connection');
 
-    if (io.nsps['/'].adapter.rooms["room-"+roomno] && io.nsps['/'].adapter.rooms["room-"+roomno].length > 1) roomno++;
-    socket.join("room-"+roomno);
-    console.log("Room number: "+roomno);
+    if (io.nsps['/'].adapter.rooms["room-" + roomno] && io.nsps['/'].adapter.rooms["room-" + roomno].length > 1) roomno++;
 
-    io.sockets.in("room-"+roomno).emit('connectToRoom', "room-"+roomno)
+    socket.join("room-" + roomno);
+    console.log("Room number: " + roomno);
 
-    socket.on('move', function(msg) {
-        socket.on('movedRoom', function(data) {
-            console.log("moved room is: "+ data);
+    io.sockets.in("room-" + roomno).emit('connectToRoom', "room-" + roomno);
+
+    socket.on('move', function (msg) {
+        socket.on('movedRoom', function (data) {
+            console.log("moved room is: " + data);
         });
         // socket.broadcast.emit('move', msg);
         // socket.broadcast.to(otherSocket.id).emit('move', msg);
-        io.in("room-"+roomno).emit('move', msg)
+        io.in("room-" + roomno).emit('move', msg)
     });
 });
 
