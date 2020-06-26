@@ -5,9 +5,17 @@ window.onload = function () {
     initGame(); // Initializes game for first board setup
 };
 
+const { username, room } = Qs.parse(location.search, {
+    ignoreQueryPrefix: true
+});
+
+console.log(username, room);
+
 // setup my socket client
 var socket = io();
 
+// Join a room:
+socket.emit('joinRoom', { username, room });
 
 var initGame = function () {
     var cfg = { // Initial configuration
@@ -29,20 +37,14 @@ var handleMove = function (source, target) {
     if (move === null) return 'snapback'; // If its an invalid move
 
     // However, if valid:
-    else socket.emit("move", move);
+    else socket.emit('move', move);
 };
 
-socket.on('connectToRoom', function (data) {
-    var newdiv = document.getElementById("room-number");
-    newdiv.innerHTML = data;
-    console.log('dhshdasdi');
-});
+socket.on('message', message => {
+    console.log(message);
+})
 
 socket.on('move', function (msg) {
-    var room_div = document.getElementById("room-number");
-    data = room_div.innerHTML;
     game.move(msg);
     board.position(game.fen());
-    socket.emit('movedRoom', data);
-    console.log(data);
 });
