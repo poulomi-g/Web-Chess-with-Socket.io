@@ -50,10 +50,7 @@ socket.on('move', function (msg) {
 });
 
 socket.on('roomFull', function (msg) {
-    window.location.href = "/";
-    console.log(msg);
-    window.addEventListener('DOMContentLoaded', (event) => {
-        alert('checking');
-    });
+    (window.location.href = "/")
+        .then(alert(msg));
 });
 
