@@ -48,3 +48,12 @@ socket.on('move', function (msg) {
     game.move(msg);
     board.position(game.fen());
 });
+
+socket.on('roomFull', function (msg) {
+    window.location.href = "/";
+    console.log(msg);
+    window.addEventListener('DOMContentLoaded', (event) => {
+        alert('checking');
+    });
+});
+

@@ -11,23 +11,48 @@ const io = socketio(server);
 
 const PORT = process.env.PORT || 3000;
 
+
+
 server.listen(PORT, () => console.log(`Running on ${PORT}`));
 var roomno = 1;
+var numClients = {};
 io.on('connection', function (socket) {
 
     socket.on('joinRoom', ({ username, room }) => {
 
         const user = userJoin(socket.id, username, room);
 
-        socket.join(user.room);
 
-        socket.emit('message', 'Welcome message');
+        if (numClients[room] === 2) {
+            socket.emit('roomFull', `${room} is full`);
+        }
 
-        //Tell others that user has connected
-        socket.broadcast.to(user.room).emit('message', `${username} has joined`);
+        if (numClients[room] == undefined) {
+            numClients[room] = 1;
+            socket.join(user.room);
+            socket.emit('message', 'Welcome message');
 
+            //Tell others that user has connected
+            socket.broadcast.to(user.room).emit('message', `${username} has joined`);
+        }
+
+        else if (numClients[room] < 2) {
+
+            socket.join(user.room);
+
+            socket.room = room;
+
+            socket.emit('message', 'Welcome message');
+
+            //Tell others that user has connected
+            socket.broadcast.to(user.room).emit('message', `${username} has joined`);
+
+            numClients[room]++;
+        }
+        console.log(numClients[room]);
     });
     console.log('new connection');
+
 
 
     // Listen for move:
@@ -59,4 +84,3 @@ app.get('/', function (req, res) {
 
 
 app.use(express.static(path.join(__dirname, 'public')));
-
