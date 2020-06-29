@@ -28,6 +28,9 @@ var initGame = function () {
 
     board = new ChessBoard('gameBoard', cfg);
     game = new Chess();
+
+    var turn = game.turn();
+    console.log(turn);
 };
 
 
@@ -36,8 +39,26 @@ var handleMove = function (source, target) {
 
     if (move === null) return 'snapback'; // If its an invalid move
 
+
     // However, if valid:
-    else socket.emit('move', move);
+    else {
+        var turn = game.turn();
+        console.log(turn);
+
+        socket.emit('turn', turn)
+
+        socket.on('turnValidity', function (turnValidity) {
+            console.log(turnValidity);
+            if (turnValidity === false) {
+                var undomove = game.undo();
+                if (undomove != null) {
+                    socket.emit('undoMove', undomove);
+                }
+            } else { socket.emit('move', move); }
+        });
+
+    }
+
 };
 
 socket.on('message', message => {
@@ -49,8 +70,14 @@ socket.on('move', function (msg) {
     board.position(game.fen());
 });
 
+socket.on('undoMove', function (msg) {
+    //game.move(msg);
+    board.position(game.fen());
+})
+
 socket.on('roomFull', function (msg) {
     (window.location.href = "/")
         .then(alert(msg));
 });
+
 

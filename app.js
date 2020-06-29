@@ -20,23 +20,25 @@ io.on('connection', function (socket) {
 
     socket.on('joinRoom', ({ username, room }) => {
 
-        const user = userJoin(socket.id, username, room);
-
 
         if (numClients[room] === 2) {
             socket.emit('roomFull', `${room} is full`);
         }
 
-        if (numClients[room] == undefined) {
+        if (numClients[room] == undefined) { // First user joining
+            const user = userJoin(socket.id, username, room, 'w');
             numClients[room] = 1;
             socket.join(user.room);
             socket.emit('message', 'Welcome message');
 
             //Tell others that user has connected
-            socket.broadcast.to(user.room).emit('message', `${username} has joined`);
+            socket.broadcast.to(user.room).emit('message', `${username} has joined, piece is ${user.piece}`);
+
         }
 
-        else if (numClients[room] < 2) {
+        else if (numClients[room] < 2) { // Second user joining
+
+            const user = userJoin(socket.id, username, room, 'b');
 
             socket.join(user.room);
 
@@ -45,7 +47,7 @@ io.on('connection', function (socket) {
             socket.emit('message', 'Welcome message');
 
             //Tell others that user has connected
-            socket.broadcast.to(user.room).emit('message', `${username} has joined`);
+            socket.broadcast.to(user.room).emit('message', `${username} has joined, piece is ${user.piece}`);
 
             numClients[room]++;
         }
@@ -63,17 +65,28 @@ io.on('connection', function (socket) {
         io.to(user.room).emit('move', msg);
     });
 
+    socket.on('undoMove', function (msg) {
+
+        const user = getCurrentUser(socket.id);
+
+        //io.to(user.room).emit('undoMove', msg);
+    });
+
+    socket.on('turn', (turn) => {
+        const user = getCurrentUser(socket.id);
+
+
+        if (user.piece === turn) {
+            socket.emit('turnValidity', true);
+        } else {
+            socket.emit('turnValidity', false);
+        }
+    });
+
     // Upon disconnection
     socket.on('disconnect', () => {
         io.emit('message', 'User left');
     });
-
-    // if (io.nsps['/'].adapter.rooms["room-" + roomno] && io.nsps['/'].adapter.rooms["room-" + roomno].length > 1) roomno++;
-
-    // socket.join("room-" + roomno);
-    // console.log("Room number: " + roomno);
-
-    // io.sockets.in("room-" + roomno).emit('connectToRoom', "room-" + roomno);
 
 
 });
