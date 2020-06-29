@@ -69,7 +69,7 @@ io.on('connection', function (socket) {
 
         const user = getCurrentUser(socket.id);
 
-        //io.to(user.room).emit('undoMove', msg);
+        socket.emit('undoMove', msg);
     });
 
     socket.on('turn', (turn) => {

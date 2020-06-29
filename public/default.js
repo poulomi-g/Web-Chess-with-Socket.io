@@ -71,7 +71,7 @@ socket.on('move', function (msg) {
 });
 
 socket.on('undoMove', function (msg) {
-    //game.move(msg);
+    game.move(msg);
     board.position(game.fen());
 })
 
