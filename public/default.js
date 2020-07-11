@@ -14,6 +14,9 @@ console.log(username, room);
 // setup my socket client
 var socket = io();
 
+var gameState;
+var turn;
+
 // Join a room:
 socket.emit('joinRoom', { username, room });
 
@@ -29,10 +32,12 @@ var initGame = function () {
     board = new ChessBoard('gameBoard', cfg);
     game = new Chess();
 
-    var turn = game.turn();
-    console.log(turn);
-};
+    gameState = game.fen();
+    turn = game.turn();
 
+    console.log('Next turn is: ' + turn);
+
+};
 
 var handleMove = function (source, target) {
     var move = game.move({ from: source, to: target });
@@ -42,19 +47,19 @@ var handleMove = function (source, target) {
 
     // However, if valid:
     else {
-        var turn = game.turn();
-        console.log(turn);
 
         socket.emit('turn', turn)
 
         socket.on('turnValidity', function (turnValidity) {
             console.log(turnValidity);
             if (turnValidity === false) {
-                var undomove = game.undo();
-                if (undomove != null) {
-                    socket.emit('undoMove', undomove);
-                }
-            } else { socket.emit('move', move); }
+                // if (undomove != null) {
+                //     // socket.emit('undoMove', undomove);
+                // }
+                game.load(gameState);
+            } else {
+                socket.emit('move', move);
+            }
         });
 
     }
@@ -68,6 +73,11 @@ socket.on('message', message => {
 socket.on('move', function (msg) {
     game.move(msg);
     board.position(game.fen());
+
+    turn = game.turn();
+    console.log('Next turn is: ' + turn);
+
+    gameState = game.fen();
 });
 
 socket.on('undoMove', function (msg) {
