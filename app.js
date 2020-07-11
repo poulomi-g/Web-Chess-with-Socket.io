@@ -29,7 +29,7 @@ io.on('connection', function (socket) {
             const user = userJoin(socket.id, username, room, 'w');
             numClients[room] = 1;
             socket.join(user.room);
-            socket.emit('message', 'Welcome message');
+            socket.emit('message', `Your color is: ${user.piece}`);
 
             //Tell others that user has connected
             socket.broadcast.to(user.room).emit('message', `${username} has joined, piece is ${user.piece}`);
@@ -44,11 +44,11 @@ io.on('connection', function (socket) {
 
             socket.room = room;
 
-            socket.emit('message', 'Welcome message');
+            socket.emit('message', `Your color is: ${user.piece}`);
 
             //Tell others that user has connected
             socket.broadcast.to(user.room).emit('message', `${username} has joined, piece is ${user.piece}`);
-
+            socket.broadcast.to(user.room).emit('Color', user.piece);
             numClients[room]++;
         }
         console.log(numClients[room]);

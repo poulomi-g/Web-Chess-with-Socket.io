@@ -68,6 +68,8 @@ var handleMove = function (source, target) {
 
 socket.on('message', message => {
     console.log(message);
+    var status = document.getElementById("status")
+    status.innerHTML = 'Status: ' + message;
 })
 
 socket.on('move', function (msg) {
@@ -76,7 +78,9 @@ socket.on('move', function (msg) {
 
     turn = game.turn();
     console.log('Next turn is: ' + turn);
-
+    var turnDiv = document.getElementById("turn")
+    turnDiv.innerHTML = 'Next turn is: ' + turn;
+    console.log(turnDiv);
     gameState = game.fen();
 });
 
@@ -89,5 +93,10 @@ socket.on('roomFull', function (msg) {
     (window.location.href = "/")
         .then(alert(msg));
 });
+
+// socket.on('color', function (color) {
+//     var assignedColor = document.getElementById("assignedColor")
+//     assignedColor.innerHTML = 'Your color is: ' + color;
+// });
 
 
